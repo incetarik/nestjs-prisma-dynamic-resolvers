@@ -16,7 +16,7 @@ export interface IGraphQLExtractSelectionMap {
   [ k: string ]: string | ((parentKeys: string[], fieldName: string) => string)
 }
 
-export interface IParams {
+export interface IExtractGraphQLSelectionsParams {
   /**
    * The root node of the GraphQL request.
    *
@@ -47,10 +47,12 @@ export interface IParams {
  * the `select` property of Prisma queries.
  *
  * @export
- * @param {IParams} params The parameters for extraction.
+ * @param {IExtractGraphQLSelectionsParams} params The parameters for
+ * extraction.
+ * 
  * @return {*} An object of `selected` field names.
  */
-export function extractGraphQLSelections(params: IParams) {
+export function extractGraphQLSelections(params: IExtractGraphQLSelectionsParams) {
   const { node, parentFieldKeys = [], selectionMap = {} } = params
 
   const { selectionSet } = node

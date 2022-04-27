@@ -5,7 +5,8 @@ export {
   provideDynamicResolvers,
   IExtractGraphQLSelectionPathParams,
   IGraphQLExtractSelectionMap,
-  IParams,
+  IExtractGraphQLSelectionsParams as IParams,
 } from './helpers'
+
 export { NavigationProperty } from './navigation-property'
 export { UseDynamicResolvers } from './use-dynamic-resolvers'
