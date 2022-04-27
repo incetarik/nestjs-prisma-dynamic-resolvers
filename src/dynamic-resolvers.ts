@@ -27,7 +27,7 @@ export interface IOnResolvingParams<P extends object = object> {
   readonly resolveInfo: GraphQLResolveInfo
 }
 
-export interface IOnResolvedParams<R extends object, P extends object = object> extends IOnResolvingParams<P> {
+export interface IOnResolvedParams<R = any, P extends object = object> extends IOnResolvingParams<P> {
   /**
    * The data resolved by the resolver.
    *
@@ -43,7 +43,7 @@ export interface IOnResolvedParams<R extends object, P extends object = object> 
  * @export
  * @interface IUseDynamicResolversParams
  */
-export interface IUseDynamicResolversParams<R extends object = object, P extends object = object> {
+export interface IUseDynamicResolversParams {
   /**
    * The name of the module that will contain the resolver.
    *
@@ -93,7 +93,7 @@ export interface IUseDynamicResolversParams<R extends object = object, P extends
    * An event function that will be triggered when the resolver is about to resolve the defined navigation.
    *
    * @param {IOnResolvingParams<P>} params The parameters.
-   * @return {(Promise<R | undefined | void> | R | undefined | void)} The
+   * @return {*} The
    * replace value.
    * 
    * If this function returns a value from this event function, then the
@@ -102,13 +102,13 @@ export interface IUseDynamicResolversParams<R extends object = object, P extends
    * 
    * @memberof IUseDynamicResolversParams
    */
-  onResolving?(params: IOnResolvingParams<P>): Promise<R | undefined | void> | R | undefined | void
+  onResolving?<P extends object>(params: IOnResolvingParams<P>): any
 
   /**
    * An event function that will be triggered when the resolved is resolved the defined navigation.
    *
-   * @param {IOnResolvedParams<R, P>} params The parameters.
-   * @return {(Promise<R | undefined | void> | undefined | void)} The
+   * @param {IOnResolvedParams<any, P>} params The parameters.
+   * @return {*} The
    * replace value.
    * 
    * If this function returns a value from this event function, then the
@@ -117,7 +117,7 @@ export interface IUseDynamicResolversParams<R extends object = object, P extends
    * 
    * @memberof IUseDynamicResolversParams
    */
-  onResolved?(params: IOnResolvedParams<R, P>): Promise<R | undefined | void> | undefined | void
+  onResolved?<P extends object = object>(params: IOnResolvedParams<any, P>): any
 }
 
 export interface IRegisterDynamicResolverParams extends IUseDynamicResolversParams {

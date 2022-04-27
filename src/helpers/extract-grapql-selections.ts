@@ -11,12 +11,14 @@ import { FieldNode, GraphQLResolveInfo, Kind } from 'graphql'
  *
  * @export
  * @interface IGraphQLExtractSelectionMap
+ * @template T The type of the source.
+ * @template K The keys included of the source.
  */
-export interface IGraphQLExtractSelectionMap {
-  [ k: string ]: string | ((parentKeys: string[], fieldName: string) => string)
+export type IGraphQLExtractSelectionMap<T extends object = object, K extends keyof T = Exclude<ObjectKeys<T>, KeysMatching<T, Date>>> = {
+  [ k in K ]?: string | ((parentKeys: string[], fieldName: K) => string)
 }
 
-export interface IExtractGraphQLSelectionsParams {
+interface IExtractGraphQLSelectionsParams<T extends object = object, K extends keyof T = Exclude<ObjectKeys<T>, KeysMatching<T, Date>>> {
   /**
    * The root node of the GraphQL request.
    *
@@ -28,10 +30,10 @@ export interface IExtractGraphQLSelectionsParams {
   /**
    * The map for renaming the field names to database navigation keys.
    *
-   * @type {IGraphQLExtractSelectionMap}
+   * @type {IGraphQLExtractSelectionMap<T, K>}
    * @memberof IParams
    */
-  selectionMap?: IGraphQLExtractSelectionMap
+  selectionMap?: IGraphQLExtractSelectionMap<T, K>
 
   /**
    * The name array of the parent fields.
@@ -51,8 +53,10 @@ export interface IExtractGraphQLSelectionsParams {
  * extraction.
  * 
  * @return {*} An object of `selected` field names.
+ * @template T The type of the source.
+ * @template K The keys included of the source.
  */
-export function extractGraphQLSelections(params: IExtractGraphQLSelectionsParams) {
+export function extractGraphQLSelections<T extends object = object, K extends keyof T = Exclude<ObjectKeys<T>, KeysMatching<T, Date>>>(params: IExtractGraphQLSelectionsParams<T, K>) {
   const { node, parentFieldKeys = [], selectionMap = {} } = params
 
   const { selectionSet } = node
@@ -69,7 +73,7 @@ export function extractGraphQLSelections(params: IExtractGraphQLSelectionsParams
         parentFieldKeys: [ ...parentFieldKeys, fieldName ]
       })
 
-      const mapper = selectionMap[ fieldName ]
+      const mapper = selectionMap[ fieldName as keyof typeof selectionMap ] as any
       let mappedValue: string
       if (typeof mapper === 'string') {
         mappedValue = mapper
@@ -97,7 +101,7 @@ export function extractGraphQLSelections(params: IExtractGraphQLSelectionsParams
   }, {} as Record<string, any>)
 }
 
-export interface IExtractGraphQLSelectionPathParams {
+interface IExtractGraphQLSelectionPathParams<T extends object = object, K extends keyof T = Exclude<ObjectKeys<T>, KeysMatching<T, Date>>> {
   /**
    * The initial path of the request.
    *
@@ -109,11 +113,11 @@ export interface IExtractGraphQLSelectionPathParams {
   /**
    * The map for renaming the field names to database navigation keys.
    *
-   * @type {IGraphQLExtractSelectionMap}
+   * @type {IGraphQLExtractSelectionMap<T, K>}
    * @memberof IParams
    * @default {}
    */
-  selectionMap?: IGraphQLExtractSelectionMap
+  selectionMap?: IGraphQLExtractSelectionMap<T, K>
 
   /**
    * The initial root paths.
@@ -131,10 +135,14 @@ export interface IExtractGraphQLSelectionPathParams {
  * @export
  * @param {IExtractGraphQLSelectionPathParams} params The parameters for
  * extraction.
+ * 
  * @return {string[]} An array containing field names from the outer level to
  * the inner level.
+ * 
+ * @template T The type of the source.
+ * @template K The keys included of the source.
  */
-export function extractGraphQLSelectionPath(params: IExtractGraphQLSelectionPathParams): string[] {
+export function extractGraphQLSelectionPath<T extends object = object, K extends keyof T = Exclude<ObjectKeys<T>, KeysMatching<T, Date>>>(params: IExtractGraphQLSelectionPathParams<T, K>): string[] {
   const { path, selectionMap = {}, rootPaths = [] } = params
   if (typeof path !== 'object') return rootPaths
 
@@ -145,7 +153,7 @@ export function extractGraphQLSelectionPath(params: IExtractGraphQLSelectionPath
     rootPaths
   })
 
-  const mapper = selectionMap[ key ]
+  const mapper = selectionMap[ key as keyof typeof selectionMap ] as any
   let mappedValue: string
   if (typeof mapper === 'string') {
     mappedValue = mapper
