@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "description": "A library containing decorators for creating dynamic resolvers between database table objects through their navigation property.",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "prepublish": "tsc"
   },
   "repository": {
     "type": "git",
