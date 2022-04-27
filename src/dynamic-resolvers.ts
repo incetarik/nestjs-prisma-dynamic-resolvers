@@ -77,6 +77,19 @@ export interface IUseDynamicResolversParams<R extends object = object, P extends
   primaryKeyName?: string
 
   /**
+   * Indicates if the generated navigation map should be kept as metadata of the
+   * target type.
+   * 
+   * Set this property to `false` to keep the navigation map and use
+   * {@link getNavigationMapsOf} function to get the navigation map of the type.
+   *
+   * @type {boolean}
+   * @memberof IUseDynamicResolversParams
+   * @default false
+   */
+  keepNavigationMap?: boolean
+
+  /**
    * An event function that will be triggered when the resolver is about to resolve the defined navigation.
    *
    * @param {IOnResolvingParams<P>} params The parameters.
@@ -159,7 +172,7 @@ export function generateDynamicResolvers(groupName = '_global', freeMemory = tru
   const resolverClasses: Dictionary<Type[]> = {}
 
   for (const params of resolverParams) {
-    const { target } = params
+    const { target, keepNavigationMap = false } = params
     const [ navigationMaps, selectionMap ] = _generateMapsForType(target)
     if (!navigationMaps) continue
 
@@ -176,7 +189,10 @@ export function generateDynamicResolvers(groupName = '_global', freeMemory = tru
     }
 
     resolverClasses[ target.name ] = resolversOfTarget
-    removeNavigationMapsOf(target)
+
+    if (!keepNavigationMap) {
+      removeNavigationMapsOf(target)
+    }
   }
 
   if (freeMemory) {
