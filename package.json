@@ -1,0 +1,43 @@
+{
+  "name": "nestjs-prisma-dynamic-resolvers",
+  "version": "0.1.0",
+  "description": "A library containing decorators for creating dynamic resolvers between database table objects through their navigation property.",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/incetarik/nestjs-prisma-dynamic-resolvers.git"
+  },
+  "keywords": [
+    "nestjs",
+    "prisma",
+    "resolver",
+    "decorator"
+  ],
+  "author": "Tarık İnce <incetarik@hotmail.com>",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/incetarik/nestjs-prisma-dynamic-resolvers/issues"
+  },
+  "homepage": "https://github.com/incetarik/nestjs-prisma-dynamic-resolvers#readme",
+  "dependencies": {
+    "@nestjs/graphql": "10.0.10",
+    "prisma": "3.12.0",
+    "graphql": "16.3.0",
+    "@nestjs/common": "8.4.4",
+    "reflect-metadata": "0.1.13",
+    "@nestjs/core": "8.4.4",
+    "rxjs": "7.5.5",
+    "@prisma/client": "3.12.0"
+  },
+  "peerDependencies": {
+    "@nestjs/graphql": ">= 10.0",
+    "@nestjs/core": ">= 8.0",
+    "prisma": ">= 3.0"
+  },
+  "devDependencies": {
+    "typescript": "4.6.3"
+  }
+}
