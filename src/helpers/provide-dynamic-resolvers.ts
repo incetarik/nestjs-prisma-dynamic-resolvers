@@ -9,15 +9,15 @@ import { flattenArray } from './flatten-array'
  * Returns the {@link Provider} array of dynamic resolvers.
  *
  * @export
- * @param {PrismaClient} prismaService The prisma service used for reaching the
- * database by the resolvers.
+ * @param {Type<PrismaClient>} prismaService The prisma service used for
+ * reaching the database by the resolvers.
  * 
  * @param {string} [moduleName='_global'] The name of the module which will be
  * loaded.
  * 
- * @return {Provider<any[]>[]} The array of dynamic resolvers.
+ * @return {Provider<any>[]} The array of dynamic resolvers.
  */
-export function provideDynamicResolvers(prismaService: PrismaClient, moduleName = '_global'): Provider<any[]>[] {
+export function provideDynamicResolvers(prismaService: Type<PrismaClient>, moduleName = '_global'): Provider<any>[] {
   return [
     { provide: SYM_PRISMA_CLIENT, useExisting: prismaService },
     ...buildDynamicResolversArray(moduleName)
