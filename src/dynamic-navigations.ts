@@ -265,7 +265,7 @@ export function registerNavigation<A extends Type, B extends Type>(params: INavi
  * @export
  * @return {INavigationMap[]} An array of navigation map definitions.
  */
-export function getNavigationMap() {
+export function getNavigationMaps() {
   return _navigations ? [ ..._navigations ] : []
 }
 
