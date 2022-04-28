@@ -3,6 +3,16 @@ This file contains the changes made to the package.
 
 The sections are in descending order of the change date.
 
+## [0.1.9] - 2022-04-27
+### Changed
+- `IOnResolvingParams.context` property.
+- `IOnResolvingParams.root` property.
+- `IOnResolvedParams.fromDatabase` property.
+- Now if a data is returned from `IUseDynamicResolversParams.onResolving` then
+the returned data will be available in `IUseDynamicResolversParams.onResolved`
+function. Previously, the `onResolved` function was not called if returned
+from `onResolving`.
+
 ## [0.1.7] - 2022-04-27
 ### Changed
 - Type improvements for `selectionMap` option.
@@ -21,6 +31,7 @@ object.
 The initial version of the package.
 
 [Unreleased]: https://github.com/incetarik/nestjs-prisma-dynamic-resolvers/compare/v1.0.0...HEAD
+[0.1.9]: https://github.com/incetarik/nestjs-prisma-dynamic-resolvers/compare/0.1.7...0.1.9
 [0.1.7]: https://github.com/incetarik/nestjs-prisma-dynamic-resolvers/compare/0.1.6...0.1.7
 [0.1.6]: https://github.com/incetarik/nestjs-prisma-dynamic-resolvers/compare/0.1.5...0.1.6
 [0.1.5]: https://github.com/incetarik/nestjs-prisma-dynamic-resolvers/releases/tag/0.1.5

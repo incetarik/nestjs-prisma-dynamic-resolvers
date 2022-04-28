@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql'
 
 import { Inject, Type } from '@nestjs/common'
-import { Info, Parent, ResolveField, Resolver } from '@nestjs/graphql'
+import { Context, GraphQLExecutionContext, Info, Parent, ResolveField, Resolver, Root } from '@nestjs/graphql'
 
 import { SYM_PRISMA_CLIENT } from './constants'
 import { getNavigationMapsOf, INavigationMap, removeNavigationMapsOf } from './dynamic-navigations'
@@ -9,7 +9,7 @@ import { extractGraphQLSelectionPath, extractGraphQLSelections, toCamelCase } fr
 
 let _resolverParams: IRegisterDynamicResolverParams[] | undefined
 
-export interface IOnResolvingParams<P extends object = object> {
+export interface IOnResolvingParams<P extends object = object, TRoot extends object = object> {
   /**
    * The parent object.
    *
@@ -25,9 +25,25 @@ export interface IOnResolvingParams<P extends object = object> {
    * @memberof IOnResolvingParams
    */
   readonly resolveInfo: GraphQLResolveInfo
+
+  /**
+   * The execution context.
+   *
+   * @type {GraphQLExecutionContext}
+   * @memberof IOnResolvingParams
+   */
+  readonly context: GraphQLExecutionContext
+
+  /**
+   * The root object.
+   *
+   * @type {TRoot}
+   * @memberof IOnResolvingParams
+   */
+  readonly root: TRoot
 }
 
-export interface IOnResolvedParams<R = any, P extends object = object> extends IOnResolvingParams<P> {
+export interface IOnResolvedParams<R = any, P extends object = object, TRoot extends object = object> extends IOnResolvingParams<P, TRoot> {
   /**
    * The data resolved by the resolver.
    *
@@ -35,6 +51,17 @@ export interface IOnResolvedParams<R = any, P extends object = object> extends I
    * @memberof IOnResolvedParams
    */
   data: R
+
+  /**
+   * Indicates if the {@link data} is resolved from the database or not.
+   * 
+   * This property will be `false` if the {@link data} is got from the
+   * {@link IUseDynamicResolversParams.onResolving} method.
+   *
+   * @type {boolean}
+   * @memberof IOnResolvedParams
+   */
+  readonly fromDatabase: boolean
 }
 
 /**
@@ -102,7 +129,7 @@ export interface IUseDynamicResolversParams {
    * 
    * @memberof IUseDynamicResolversParams
    */
-  onResolving?<P extends object>(params: IOnResolvingParams<P>): any
+  onResolving?<P extends object = object, TRoot extends object = object>(params: IOnResolvingParams<P, TRoot>): any
 
   /**
    * An event function that will be triggered when the resolved is resolved the defined navigation.
@@ -117,7 +144,7 @@ export interface IUseDynamicResolversParams {
    * 
    * @memberof IUseDynamicResolversParams
    */
-  onResolved?<P extends object = object>(params: IOnResolvedParams<any, P>): any
+  onResolved?<P extends object = object, TRoot extends object = object>(params: IOnResolvedParams<any, P, TRoot>): any
 }
 
 export interface IRegisterDynamicResolverParams extends IUseDynamicResolversParams {
@@ -267,34 +294,32 @@ function _makeDynamicResolver(params: IMakeDynamicResolverParams) {
     constructor(@Inject(SYM_PRISMA_CLIENT) protected readonly prisma: any) {
       super(prisma)
     }
-  }
 
-  const {
-    source,
-    relation,
-    sourceProperty,
-  } = navigationMap
-
-  const isArray = relation.indexOf('*') >= 0
-  const handlerMethodDescriptor: PropertyDescriptor = {
-    async value(this: DynamicResolver, parent: { id: string }, info: GraphQLResolveInfo) {
+    protected async fireOnResolvingEvent(parent: { id: string }, root: any, info: GraphQLResolveInfo, context: GraphQLExecutionContext) {
       if (typeof onResolving === 'function') {
         const replaceValue = await onResolving({
+          root,
           parent,
+          context,
           resolveInfo: info,
         })
 
         if (typeof replaceValue === 'object') {
-          return replaceValue
+          return [ true, replaceValue ]
         }
       }
 
-      const data = await this.resolve(parent, primaryKeyName, info, navigationMap, selectionMap)
+      return [ false ]
+    }
 
+    protected async fireOnResolvedEvent(parent: { id: string }, root: any, info: GraphQLResolveInfo, data: any, context: GraphQLExecutionContext, fromDatabase: boolean) {
       if (typeof onResolved === 'function') {
         const replaceValue = await onResolved({
           data,
+          root,
           parent,
+          context,
+          fromDatabase,
           resolveInfo: info,
         })
 
@@ -307,10 +332,31 @@ function _makeDynamicResolver(params: IMakeDynamicResolverParams) {
     }
   }
 
+  const {
+    source,
+    relation,
+    sourceProperty,
+  } = navigationMap
+
+  const isArray = relation.indexOf('*') >= 0
+  const handlerMethodDescriptor: PropertyDescriptor = {
+    async value(this: DynamicResolver, parent: { id: string }, root: any, info: GraphQLResolveInfo, context: GraphQLExecutionContext) {
+      const [ shouldReturn, replaceValue ] = await this.fireOnResolvingEvent(parent, root, info, context)
+      if (shouldReturn) {
+        return this.fireOnResolvedEvent(parent, root, info, replaceValue, context, false)
+      }
+
+      const data = await this.resolve(parent, primaryKeyName, info, navigationMap, selectionMap)
+      return this.fireOnResolvedEvent(parent, root, info, data, context, true)
+    }
+  }
+
   Object.defineProperty(DynamicResolver.prototype, sourceProperty, handlerMethodDescriptor)
 
   Parent()(DynamicResolver.prototype, sourceProperty, 0)
-  Info()(DynamicResolver.prototype, sourceProperty, 1)
+  Root()(DynamicResolver.prototype, sourceProperty, 1)
+  Info()(DynamicResolver.prototype, sourceProperty, 2)
+  Context()(DynamicResolver.prototype, sourceProperty, 3)
 
   const resolvedType = isArray ? [ target ] : target
   ResolveField(() => resolvedType, {
