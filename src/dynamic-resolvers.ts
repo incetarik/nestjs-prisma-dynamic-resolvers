@@ -1,11 +1,27 @@
 import { GraphQLResolveInfo } from 'graphql'
 
 import { Inject, Type } from '@nestjs/common'
-import { Context, GraphQLExecutionContext, Info, Parent, ResolveField, Resolver, Root } from '@nestjs/graphql'
+import {
+  Context,
+  GraphQLExecutionContext,
+  Info,
+  Parent,
+  ResolveField,
+  Resolver,
+  Root,
+} from '@nestjs/graphql'
 
 import { SYM_PRISMA_CLIENT } from './constants'
-import { getNavigationMapsOf, INavigationMap, removeNavigationMapsOf } from './dynamic-navigations'
-import { extractGraphQLSelectionPath, extractGraphQLSelections, toCamelCase } from './helpers'
+import {
+  getNavigationMapsOf,
+  INavigationMap,
+  removeNavigationMapsOf,
+} from './dynamic-navigations'
+import {
+  extractGraphQLSelectionPath,
+  extractGraphQLSelections,
+  toCamelCase,
+} from './helpers'
 
 let _resolverParams: IRegisterDynamicResolverParams[] | undefined
 
@@ -107,7 +123,7 @@ export interface IUseDynamicResolversParams {
    * Indicates if the generated navigation map should be kept as metadata of the
    * target type.
    * 
-   * Set this property to `false` to keep the navigation map and use
+   * Set this property to `true` to keep the navigation map and use
    * {@link getNavigationMapsOf} function to get the navigation map of the type.
    *
    * @type {boolean}
