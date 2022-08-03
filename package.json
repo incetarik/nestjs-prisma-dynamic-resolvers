@@ -1,6 +1,6 @@
 {
   "name": "nestjs-prisma-dynamic-resolvers",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "A library containing decorators for creating dynamic resolvers between database table objects through their navigation property.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
