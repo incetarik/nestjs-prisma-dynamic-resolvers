@@ -6,6 +6,7 @@ export {
   extractGraphQLSelections,
   provideDynamicResolvers,
   IGraphQLExtractSelectionMap,
+  IGraphQLPrismaSelect,
 } from './helpers'
 
 export { NavigationProperty } from './navigation-property'
