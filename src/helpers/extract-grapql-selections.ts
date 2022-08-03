@@ -18,6 +18,28 @@ export type IGraphQLExtractSelectionMap<T extends object = object, K extends key
   [ k in K ]?: string | ((parentKeys: string[], fieldName: K) => string)
 }
 
+/**
+ * A recursive type that supports partial `select` mapping of a `Prisma`
+ * select.
+ */
+export type IGraphQLPrismaSelect<T extends object = object, K extends keyof T = Exclude<ObjectKeys<T>, KeysMatching<T, Date | Function>>> = {
+  [ k in K ]?: T[ k ] extends object
+  ? (T[ k ] extends Date
+    ? boolean
+    : (
+      T[ k ] extends any[]
+      ? boolean
+      : (T[ k ] extends (...args: any[]) => any
+        ? never
+        : (boolean | {
+          select?: IGraphQLPrismaSelect<T[ k ], keyof T[ k ]>
+        })
+      )
+    )
+  )
+  : boolean
+}
+
 interface IExtractGraphQLSelectionsParams<T extends object = object, K extends keyof T = Exclude<ObjectKeys<T>, KeysMatching<T, Date>>> {
   /**
    * The root node of the GraphQL request.
