@@ -1,6 +1,8 @@
-import { Type } from '@nestjs/common'
+import type { Type } from '@nestjs/common'
 
 import { toCamelCase } from './helpers'
+
+import type { KeysMatching } from './types'
 
 let _navigations: INavigationMap[] | undefined
 

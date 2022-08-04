@@ -16,7 +16,10 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipDefaultLibCheck": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "lib": [
+      "ES2015"
+    ]
   },
   "exclude": [
     "node_modules",

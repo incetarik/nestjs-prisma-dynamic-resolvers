@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql'
+import type { GraphQLResolveInfo } from 'graphql'
 
 import { Inject, Type } from '@nestjs/common'
 import {
@@ -22,6 +22,8 @@ import {
   extractGraphQLSelections,
   toCamelCase,
 } from './helpers'
+
+import type { Dictionary } from './types'
 
 let _resolverParams: IRegisterDynamicResolverParams[] | undefined
 

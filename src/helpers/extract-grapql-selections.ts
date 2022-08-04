@@ -1,5 +1,7 @@
 import { FieldNode, GraphQLResolveInfo, Kind } from 'graphql'
 
+import type { ObjectKeys, KeysMatching } from '../types'
+
 /**
  * Defines how the fields should be renamed/mapped.
  *

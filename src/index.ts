@@ -1,6 +1,5 @@
-import '../types'
-
 export * from './dynamic-navigations'
+
 export {
   extractGraphQLSelectionPath,
   extractGraphQLSelections,
