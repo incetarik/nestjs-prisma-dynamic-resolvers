@@ -4,6 +4,8 @@ export {
   extractGraphQLSelectionPath,
   extractGraphQLSelections,
   provideDynamicResolvers,
+  getGraphQLSelectionsObject,
+  modifyGraphQLSelections,
   IGraphQLExtractSelectionMap,
   IGraphQLPrismaSelect,
 } from './helpers'

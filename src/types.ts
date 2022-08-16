@@ -49,6 +49,15 @@ export type ObjectKeys<T extends object>
   = Exclude<KeysMatching<T, object>, FunctionKeys<T>>
 
 /**
+ * Removes the nullable keys from an object.
+ */
+export type RemoveNullables<T, K = undefined | null | void> = {
+  [ P in keyof T as T[ P ] extends K ? never : P ]: T[ P ] extends object
+  ? RemoveNullables<T[ P ], K>
+  : T[ P ]
+}
+
+/**
  * Gets the length of an array.
  */
 export type Length<T extends any[]> = T extends { length: infer L } ? L : never
@@ -58,6 +67,26 @@ export type Length<T extends any[]> = T extends { length: infer L } ? L : never
 */
 export type BuildTuple<L extends number, T extends any[] = []>
   = T extends { length: L } ? T : BuildTuple<L, [ ...T, any ]>
+
+/**
+ * Defines a recursive record of `T` values.
+ */
+export type RecursiveRecord<T> = {
+  [ key in string ]: T | RecursiveRecord<T>
+}
+
+/**
+ * Maps a record values to `NewValue`.
+ */
+export type MapRecordValues<T extends object, NewValue>
+  = {
+    [ K in keyof T ]: T[ K ] extends infer V
+    ? (
+      V extends object ? MapRecordValues<V, NewValue> : NewValue
+    )
+    : T[ K ]
+  }
+
 
 type _FunctionKeys<TArray extends any[], CurrentIndex extends number = 0, Index = -1>
   = TArray extends [ infer H, ...infer T ]

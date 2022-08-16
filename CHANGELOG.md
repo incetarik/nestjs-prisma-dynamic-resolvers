@@ -3,6 +3,13 @@ This file contains the changes made to the package.
 
 The sections are in descending order of the change date.
 
+## [0.1.14]: - 2022-08-16
+### Fixed
+- Prisma Selections for deeply nested objects were not working correctly.
+
+## Added
+- Better way to handle renaming.
+
 ## [0.1.9] - 2022-04-27
 ### Changed
 - `IOnResolvingParams.context` property.
@@ -31,6 +38,8 @@ object.
 The initial version of the package.
 
 [Unreleased]: https://github.com/incetarik/nestjs-prisma-dynamic-resolvers/compare/v1.0.0...HEAD
+[0.1.13]: https://github.com/incetarik/nestjs-prisma-dynamic-resolvers/compare/0.1.3...0.1.14
+[0.1.13]: https://github.com/incetarik/nestjs-prisma-dynamic-resolvers/compare/0.1.9...0.1.13
 [0.1.9]: https://github.com/incetarik/nestjs-prisma-dynamic-resolvers/compare/0.1.7...0.1.9
 [0.1.7]: https://github.com/incetarik/nestjs-prisma-dynamic-resolvers/compare/0.1.6...0.1.7
 [0.1.6]: https://github.com/incetarik/nestjs-prisma-dynamic-resolvers/compare/0.1.5...0.1.6
