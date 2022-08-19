@@ -435,7 +435,8 @@ abstract class DynamicResolverBase {
       reverseTableName = sourceTableName,
     } = navigationMap
 
-    const isArray = relation.indexOf('*') >= 0
+    const [ _left, right ] = relation.split(':')
+    const isArray = right.indexOf('*') >= 0
 
     if (sourceProperty in parent) {
       const data = (parent as any)[ sourceProperty ]
