@@ -1,10 +1,15 @@
 import {
   FieldNode,
+  GraphQLObjectType,
   GraphQLResolveInfo,
+  GraphQLSchema,
   Kind,
   SelectionNode,
   SelectionSetNode,
 } from 'graphql'
+
+import { getNavigationMaps, INavigationMap } from '../dynamic-navigations'
+import { getInnerType } from './get-inner-type'
 
 import type { ObjectKeys, KeysMatching, RecursiveRecord, MapRecordValues, RemoveNullables } from '../types'
 
@@ -296,24 +301,14 @@ interface IExtractGraphQLSelectionPathParams<T extends object = object, K extend
    * @memberof IExtractGraphQLSelectionPathParams
    */
   path?: GraphQLResolveInfo[ 'path' ]
+}
 
-  /**
-   * The map for renaming the field names to database navigation keys.
-   *
-   * @type {IGraphQLExtractSelectionMap<T, K>}
-   * @memberof IParams
-   * @default {}
-   */
-  selectionMap?: IGraphQLExtractSelectionMap<T, K>
-
-  /**
-   * The initial root paths.
-   *
-   * @type {string[]}
-   * @memberof IExtractGraphQLSelectionPathParams
-   * @default []
-   */
-  rootPaths?: string[]
+type PathInfo = {
+  propertyName: string
+  tableName: string
+  table?: Function
+  navigationMaps?: INavigationMap[]
+  parentTypeName?: string
 }
 
 /**
@@ -329,33 +324,72 @@ interface IExtractGraphQLSelectionPathParams<T extends object = object, K extend
  * @template T The type of the source.
  * @template K The keys included of the source.
  */
-export function extractGraphQLSelectionPath<T extends object = object, K extends keyof T = Exclude<ObjectKeys<T>, KeysMatching<T, Date>>>(params: IExtractGraphQLSelectionPathParams<T, K>): string[] {
-  const { path, selectionMap = {}, rootPaths = [] } = params
-  if (typeof path !== 'object') return rootPaths
+export function extractGraphQLSelectionPath<
+  T extends object = object,
+  K extends keyof T = Exclude<ObjectKeys<T>, KeysMatching<T, Date>>
+>(params: IExtractGraphQLSelectionPathParams<T, K>): PathInfo[] {
+  const pathInfo = [] as PathInfo[]
 
-  const { key, prev } = path
-  if (typeof key === 'number') return extractGraphQLSelectionPath({
-    path: prev,
-    selectionMap,
-    rootPaths
-  })
+  const { path } = params
+  if (typeof path !== 'object') return pathInfo
 
-  const mapper = selectionMap[ key as keyof typeof selectionMap ] as any
-  let mappedValue: string
-  if (typeof mapper === 'string') {
-    mappedValue = mapper
-  }
-  else if (typeof mapper === 'function') {
-    mappedValue = mapper(rootPaths, key)
-  }
-  else {
-    mappedValue = key
+  let current = path as typeof path | undefined
+  while (current) {
+    const { key, typename } = current
+
+    if (typeof key === 'string') {
+      pathInfo.unshift({
+        propertyName: key,
+        tableName: typename!,
+      })
+    }
+
+    current = current.prev
   }
 
-  const newBase = [ mappedValue, ...rootPaths ]
-  return extractGraphQLSelectionPath({
-    path: prev,
-    selectionMap,
-    rootPaths: newBase
-  })
+  for (let i = 1, limit = pathInfo.length; i < limit; ++i) {
+    const parentTypeName = pathInfo[ i - 1 ].tableName
+    pathInfo[ i ].parentTypeName = parentTypeName
+  }
+
+  return pathInfo
+}
+
+/**
+ * Updates the table information of a path info from given schema.
+ *
+ * @export
+ * @param {PathInfo} pathInfo The path info that will be updated.
+ * @param {GraphQLSchema} schema The GraphQL schema to update the path info.
+ * @return {boolean} `true` if the path info is updated, `false` otherwise.
+ */
+export function updatePathInfoFromSchema(pathInfo: PathInfo, schema: GraphQLSchema) {
+  if (pathInfo.table) return false
+  const { propertyName, tableName } = pathInfo
+
+  if (tableName === 'Query') return false
+  if (tableName === 'Subscription') return false
+  if (tableName === 'Mutation') return false
+
+  const schemaType = schema.getType(tableName)
+  if (!schemaType) return false
+
+  if (typeof (schemaType as GraphQLObjectType)[ 'getFields' ] !== 'function') {
+    return false
+  }
+
+  const fields = (schemaType as GraphQLObjectType).getFields()
+  const selectedField = fields[ propertyName ]
+
+  const selectedType = getInnerType(selectedField.type)
+  if (!('name' in selectedType)) return false
+
+  const { name } = selectedType
+
+  const maps
+    = getNavigationMaps().filter(it => it.source.name === name)
+
+  pathInfo.table = maps[ 0 ]?.source
+  pathInfo.navigationMaps = maps
+  return true
 }

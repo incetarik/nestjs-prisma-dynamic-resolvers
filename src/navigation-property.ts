@@ -1,14 +1,14 @@
 import { Type } from '@nestjs/common'
 
 import { INavigationMap, registerNavigation } from './dynamic-navigations'
-import { toCamelCase } from './helpers'
+import { pluralizeBasic, toCamelCase } from './helpers'
 
 /**
  * A Symbol for accessing the navigation map of a type.
  */
 export const SYM_MAP = Symbol('[[NavigationMap]]')
 
-interface IParams {
+interface INavigationPropertyParameters {
   /**
    * The target class.
    *
@@ -46,7 +46,10 @@ interface IParams {
  *
  * @return {PropertyDecorator} A {@link PropertyDecorator}.
  */
-export function NavigationProperty(target: Type, tableName?: string): PropertyDecorator
+export function NavigationProperty(
+  target: Type,
+  tableName?: string
+): PropertyDecorator
 
 
 /**
@@ -54,12 +57,20 @@ export function NavigationProperty(target: Type, tableName?: string): PropertyDe
  * The navigation between the tables will be created automatically.
  *
  * @export
- * @param {IParams} params The parameters for navigation.
+ * @param {INavigationPropertyParameters} params The parameters for navigation.
  * @return {PropertyDecorator} A {@link PropertyDecorator}.
  */
-export function NavigationProperty(params: IParams): PropertyDecorator
-export function NavigationProperty(paramsOrTarget: IParams | Type, tableName?: string): PropertyDecorator {
-  let params: IParams
+export function NavigationProperty(
+  params: INavigationPropertyParameters
+): PropertyDecorator
+
+
+export function NavigationProperty(
+  paramsOrTarget: INavigationPropertyParameters | Type,
+  tableName?: string
+): PropertyDecorator {
+
+  let params: INavigationPropertyParameters
   if (typeof paramsOrTarget === 'function') {
     params = {
       target: paramsOrTarget,
@@ -77,7 +88,7 @@ export function NavigationProperty(paramsOrTarget: IParams | Type, tableName?: s
     const {
       target,
       tableName = source.constructor.name,
-      reverseNavigationName = tableName + (isArray ? 's' : '')
+      reverseNavigationName = isArray ? pluralizeBasic(tableName) : tableName
     } = params
 
     const sourceTableName = toCamelCase(tableName)

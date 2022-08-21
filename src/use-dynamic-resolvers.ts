@@ -1,6 +1,9 @@
 import { Type } from '@nestjs/common'
 
-import { IUseDynamicResolversParams, registerDynamicResolver } from './dynamic-resolvers'
+import {
+  IUseDynamicResolversParams,
+  registerDynamicResolver,
+} from './dynamic-resolver/dynamic-resolver-ops'
 
 /**
  * Decorates a class by creating dynamic resolvers from the properties

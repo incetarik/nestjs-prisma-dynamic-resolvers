@@ -2,7 +2,9 @@ import { Type } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
 
 import { SYM_PRISMA_CLIENT } from '../constants'
-import { generateDynamicResolvers } from '../dynamic-resolvers'
+import {
+  generateDynamicResolvers,
+} from '../dynamic-resolver/make-dynamic-resolver'
 import { flattenArray } from './flatten-array'
 
 /**

@@ -22,10 +22,10 @@ export interface INavigationMap {
   /**
    * The prototype of the source class.
    *
-   * @type {Object}
+   * @type {Function}
    * @memberof INavigationMap
    */
-  source: Object
+  source: Function
 
   /**
    * The target type constructor.

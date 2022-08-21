@@ -11,7 +11,7 @@ export type KeysMatching<T, V> = { [ K in keyof T ]-?: T[ K ] extends V ? K : ne
 /**
  * A Dictionary type for keeping `TValue` values.
  */
-export type Dictionary<TValue> = { [ key: string ]: TValue }
+export type Dictionary<TValue> = { [ key: string | symbol ]: TValue }
 
 /**
  * Maps the given type to its function keys.
