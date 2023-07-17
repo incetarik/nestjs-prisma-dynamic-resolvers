@@ -3,6 +3,10 @@ This file contains the changes made to the package.
 
 The sections are in descending order of the change date.
 
+## [0.1.17] - 2023-07-17
+### Changed
+- `dependencies` are moved to `peerDependencies`.
+
 ## [0.1.16] - 2022-08-21
 ### Added
 - Basic pluralization for reverse table names if one of the links in navigation
